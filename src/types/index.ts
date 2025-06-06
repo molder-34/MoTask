@@ -19,6 +19,12 @@ export interface List {
   updated_at: string;
 }
 
+export interface ListWithStats extends List {
+  taskCount: number;
+  completedCount: number;
+  completionRate: number;
+}
+
 export interface Task {
   id: string;
   list_id: string;
@@ -39,15 +45,15 @@ export enum Priority {
 }
 
 export const PRIORITY_LABELS = {
-  [Priority.HIGH]: 'High',
-  [Priority.MEDIUM]: 'Medium',
-  [Priority.LOW]: 'Low',
+  [Priority.HIGH]: "High",
+  [Priority.MEDIUM]: "Medium",
+  [Priority.LOW]: "Low",
 } as const;
 
 export const PRIORITY_COLORS = {
-  [Priority.HIGH]: 'text-red-600 bg-red-50',
-  [Priority.MEDIUM]: 'text-yellow-600 bg-yellow-50',
-  [Priority.LOW]: 'text-green-600 bg-green-50',
+  [Priority.HIGH]: "text-red-600 bg-red-50",
+  [Priority.MEDIUM]: "text-yellow-600 bg-yellow-50",
+  [Priority.LOW]: "text-green-600 bg-green-50",
 } as const;
 
 // API response types
@@ -117,12 +123,12 @@ export interface BaseComponentProps {
 }
 
 export interface ButtonProps extends BaseComponentProps {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg";
   disabled?: boolean;
   loading?: boolean;
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
+  type?: "button" | "submit" | "reset";
 }
 
 export interface InputProps extends BaseComponentProps {
@@ -147,13 +153,13 @@ export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 // Event types
 export interface TaskEvent {
-  type: 'created' | 'updated' | 'deleted' | 'completed' | 'moved';
+  type: "created" | "updated" | "deleted" | "completed" | "moved";
   task: Task;
   timestamp: string;
 }
 
 export interface ListEvent {
-  type: 'created' | 'updated' | 'deleted' | 'moved';
+  type: "created" | "updated" | "deleted" | "moved";
   list: List;
   timestamp: string;
 }

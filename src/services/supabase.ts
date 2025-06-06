@@ -1,12 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../types/database';
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../types/database";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
-    'Missing Supabase environment variables. Please check your .env file.'
+    "Missing Supabase environment variables. Please check your .env file."
   );
 }
 
@@ -75,17 +75,20 @@ export const db = {
   profiles: {
     get: async (userId: string) => {
       return await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
         .single();
     },
 
-    update: async (userId: string, updates: Partial<Database['public']['Tables']['profiles']['Update']>) => {
+    update: async (
+      userId: string,
+      updates: Partial<Database["public"]["Tables"]["profiles"]["Update"]>
+    ) => {
       return await supabase
-        .from('profiles')
+        .from("profiles")
         .update(updates)
-        .eq('id', userId)
+        .eq("id", userId)
         .select()
         .single();
     },
@@ -95,36 +98,29 @@ export const db = {
   lists: {
     getAll: async () => {
       return await supabase
-        .from('lists')
-        .select(`
-          *,
-          tasks(count)
-        `)
-        .order('position', { ascending: true });
+        .from("lists")
+        .select("*")
+        .order("position", { ascending: true });
     },
 
-    create: async (list: Database['public']['Tables']['lists']['Insert']) => {
-      return await supabase
-        .from('lists')
-        .insert(list)
-        .select()
-        .single();
+    create: async (list: Database["public"]["Tables"]["lists"]["Insert"]) => {
+      return await supabase.from("lists").insert(list).select().single();
     },
 
-    update: async (id: string, updates: Database['public']['Tables']['lists']['Update']) => {
+    update: async (
+      id: string,
+      updates: Database["public"]["Tables"]["lists"]["Update"]
+    ) => {
       return await supabase
-        .from('lists')
+        .from("lists")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
     },
 
     delete: async (id: string) => {
-      return await supabase
-        .from('lists')
-        .delete()
-        .eq('id', id);
+      return await supabase.from("lists").delete().eq("id", id);
     },
   },
 
@@ -132,63 +128,63 @@ export const db = {
   tasks: {
     getByList: async (listId: string) => {
       return await supabase
-        .from('tasks')
-        .select('*')
-        .eq('list_id', listId)
-        .order('position', { ascending: true })
-        .order('created_at', { ascending: true });
+        .from("tasks")
+        .select("*")
+        .eq("list_id", listId)
+        .order("position", { ascending: true })
+        .order("created_at", { ascending: true });
     },
 
     getAll: async () => {
       return await supabase
-        .from('tasks')
-        .select(`
+        .from("tasks")
+        .select(
+          `
           *,
           lists(name, color)
-        `)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .order("created_at", { ascending: false });
     },
 
     search: async (query: string) => {
       return await supabase
-        .from('tasks')
-        .select(`
+        .from("tasks")
+        .select(
+          `
           *,
           lists(name, color)
-        `)
-        .ilike('title', `%${query}%`)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .ilike("title", `%${query}%`)
+        .order("created_at", { ascending: false });
     },
 
-    create: async (task: Database['public']['Tables']['tasks']['Insert']) => {
-      return await supabase
-        .from('tasks')
-        .insert(task)
-        .select()
-        .single();
+    create: async (task: Database["public"]["Tables"]["tasks"]["Insert"]) => {
+      return await supabase.from("tasks").insert(task).select().single();
     },
 
-    update: async (id: string, updates: Database['public']['Tables']['tasks']['Update']) => {
+    update: async (
+      id: string,
+      updates: Database["public"]["Tables"]["tasks"]["Update"]
+    ) => {
       return await supabase
-        .from('tasks')
+        .from("tasks")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
     },
 
     delete: async (id: string) => {
-      return await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', id);
+      return await supabase.from("tasks").delete().eq("id", id);
     },
 
     toggleComplete: async (id: string, completed: boolean) => {
       return await supabase
-        .from('tasks')
+        .from("tasks")
         .update({ completed })
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
     },
@@ -199,42 +195,45 @@ export const db = {
 export const subscriptions = {
   lists: (callback: (payload: any) => void) => {
     return supabase
-      .channel('lists_changes')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'lists' 
-        }, 
+      .channel("lists_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "lists",
+        },
         callback
       )
       .subscribe();
   },
 
   tasks: (listId?: string, callback?: (payload: any) => void) => {
-    const channel = supabase.channel('tasks_changes');
-    
+    const channel = supabase.channel("tasks_changes");
+
     if (listId && callback) {
       return channel
-        .on('postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'tasks',
-            filter: `list_id=eq.${listId}`
-          }, 
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "tasks",
+            filter: `list_id=eq.${listId}`,
+          },
           callback
         )
         .subscribe();
     }
-    
+
     return channel
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'tasks' 
-        }, 
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "tasks",
+        },
         callback || (() => {})
       )
       .subscribe();
